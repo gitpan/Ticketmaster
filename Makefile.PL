@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Ticketmaster',
     VERSION_FROM      => 'lib/Ticketmaster.pm', # finds $VERSION
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {},
     ($] >= 5.005 ?
       (ABSTRACT  => 'Calculate the change in coins',
        AUTHOR         => 'Pan Yu <xiaocong[at]vip.163.com>') : ()),

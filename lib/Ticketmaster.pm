@@ -4,71 +4,117 @@ use 5.008008;
 use strict;
 use warnings;
 
-require Exporter;
 
-our @ISA = qw(Exporter);
+our $VERSION = '1.00';
 
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
+sub new {
+	my $class = shift;
+	my $type = ref($class) || $class;
+	my $self = bless {}, $type;
 
-# This allows declaration	use Ticketmaster ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
+	$self->{'coins'} = [];
+	$self->reload({ @_ }) if @_;
+	$self;
+}
+
+sub reload { 
+	my $self = shift;
+	$self->{'store'} = { @_ };
+
+	$self->{'min_coin'} = shift @{ [ sort {$a <=> $b} keys %{$self->{'store'}} ] };
+}
+
+sub change {
+	my $self = shift;
+	my $change = shift;
+
+	return [] if $change <= 0;
+	$self->{'change'} = $change;
+	$self->_calculate;
+
+	$self->{'coins'};
+}
+
+sub _calculate {
+	my $self = shift;
+	my $limit = shift;
+
+	my $store = $self->{'store'};
+	my $coin = $self->_max_coin($limit);
+
+	if ($coin) {
+		push (@{$self->{'coins'}}, $coin);
+		return if $self->{'change'} == 0;
+		$self->_calculate($coin);
+	}else{
+		# give up if no way to make change
+		my $pop_coin = $self->_withdrawal;
+		return unless $pop_coin;
+		$self->_calculate($pop_coin - 1);
+	}
+}
+
+sub _withdrawal {
+	my $self = shift;
+	my $store = $self->{'store'};
+	my $coins = $self->{'coins'};
+
+	my $coin = pop @$coins;
+	$self->{'change'} += $coin;
+	$store->{$coin} += 1;
+	return if scalar @$coins == 0 && $coin == $self->{'min_coin'};
+	return $coin;
+}
+
+sub balance {
+	my $self = shift;
 	
-) ] );
+	my %balance;
+	foreach (sort keys %{$self->{'store'}}) {
+		if ($self->{'store'}->{$_} != 0) {
+			$balance{$_} = $self->{'store'}->{$_};
+		}
+	}
+	\%balance;
+}
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+sub _max_coin {
+	my $self = shift;
+	my $limit = shift;
+	my $store = $self->{'store'};
 
-our @EXPORT = qw(
-	
-);
+	foreach my $coin (sort {$b  <=>  $a} keys %$store) {
+		# child coins shouldn't be  bigger than his parent
+		next if $limit && $coin > $limit;
+		next unless $coin <= $self->{'change'};
+		next unless $store->{$coin} > 0;
+		$store->{$coin} -= 1;
+		$self->{'change'} -= $coin;
+		my @available_coins = grep { $_ if $_ < $coin && $store->{$_} > 0 } keys %$store;
+		$self->{'available_coins'} = \@available_coins;
+		return $coin;
+	}
+	return;
+}
 
-our $VERSION = '0.01';
+sub add_coins {
+	my $self = shift;
+	my $coins = { @_ };
+	my $store = $self->{'store'};
 
+	my %new_store;
+	foreach my $pair ($coins, $store) {
+		while (my ($key, $value) = each %$pair) {
+			if (exists $new_store{$key}) {
+				$new_store{$key} += $value;
+			}else{
+				$new_store{$key} = $value;
+			}
+		}
+	}
+	$self->reload(%new_store);
+}
 
-# Preloaded methods go here.
 
 1;
-__END__
-# Below is stub documentation for your module. You'd better edit it!
-
-=head1 NAME
-
-This module is to calculate the change in coins
-
-=head1 SYNOPSIS
-
-  use Ticketmaster;
-
-=head1 DESCRIPTION
-
-The module has been almost done. Before distribute it on cpan, I would like to test it thoroughly.
-
-=head1 SEE ALSO
-
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
-
-=head1 AUTHOR
-
-Pan Yu, E<lt>xiaocong[AT]vip.163.com<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2010 by panyu
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
-
-
-=cut
 

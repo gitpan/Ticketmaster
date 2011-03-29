@@ -3,4 +3,6 @@ Revision history for Perl extension Ticketmaster.
 0.01  Wed Nov 24 14:13:04 2010
 	- original version; created by h2xs 1.23 with options
 		-XAn Ticketmaster
+1.00  Fri Mar 25 2011
+	- Main functions have been completed
 
