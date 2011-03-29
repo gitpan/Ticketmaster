@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Ticketmaster
-version:            1.00
+version:            1.01
 abstract:           Calculate the change in coins
 author:
     - Pan Yu <xiaocong[at]vip.163.com>

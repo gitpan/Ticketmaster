@@ -5,4 +5,6 @@ Revision history for Perl extension Ticketmaster.
 		-XAn Ticketmaster
 1.00  Fri Mar 25 2011
 	- Main functions have been completed
+1.01  Fri Mar 30 2011
+	- fixed a problem
 
