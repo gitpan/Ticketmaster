@@ -14,8 +14,8 @@ Ticketmaster is to generate change
 
 =head1 DESCRIPTION
 
-The module is developed for the programms which need to calculate change correctly.
-For example, a ticket machine for people to buy bus tickets needs to generates change.
+The module is for calculating change correctly.
+For example, a coins machine for people to buy bus tickets needs to generate change.
 
 =head1 CONSTRUCTOR
 
@@ -47,7 +47,7 @@ If the change cannot be made, a reference to an empty array will be returned.
 
   $store->add_coins(5 => 2, 30 => 1);
 
-Optional method, is used for increasing coins in store.
+Optional method, is used for increasing the number of coins in store.
 
 =head2 C<balance>
 
@@ -72,7 +72,7 @@ Pan Yu, E<lt>xiaocong[AT]vip.163.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 by panyu
+Copyright (C) 2011 by Pan Yu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
